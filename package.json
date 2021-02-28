@@ -1,0 +1,25 @@
+{
+  "name": "amaze",
+  "version": "1.0.0",
+  "description": "💡 My own small frontend framework for learning purpose.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "parcel index.html --open",
+    "build": "parcel build index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GaetanBrmd/amaze.git"
+  },
+  "author": "GaetanBrmd",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GaetanBrmd/amaze/issues"
+  },
+  "homepage": "https://github.com/GaetanBrmd/amaze#readme",
+  "dependencies": {
+    "parcel-bundler": "^1.12.4",
+    "snabbdom": "^2.1.0"
+  }
+}
