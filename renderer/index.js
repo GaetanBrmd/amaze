@@ -51,6 +51,60 @@ function consumeQueue() {
   rendering = false;
 }
 
+function watchFor(object, currentComponent) {
+  //For each property of the object add a setter
+  for (let propertyKey of Object.keys(object)) {
+    //If it's a nested object or array
+    if (object[propertyKey] instanceof Object) {
+      //Call itself recursively for nested objects
+      object[propertyKey] = watchFor(object[propertyKey], currentComponent);
+    }
+    //If it's a primitive type
+    else {
+      let temp = object[propertyKey];
+
+      Object.defineProperty(object, propertyKey, {
+        get: function () {
+          return temp;
+        },
+        set: function (x) {
+          console.log("UPDATED :", propertyKey, " WITH :", x);
+
+          temp = x;
+          queue(currentComponent);
+        },
+      });
+    }
+  }
+
+  //Specific treatment for array because we have to watch for push, slice etc.
+  if (Array.isArray(object)) {
+    object = new Proxy(object, {
+      apply: function (target, thisArg, argumentsList) {
+        console.log(thisArg, target, argumentsList);
+
+        return thisArg[target].apply(this, argumentList);
+      },
+      deleteProperty: function (target, property) {
+        console.log("Deleted %s", property);
+
+        queue(currentComponent);
+        return true;
+      },
+      set: function (target, property, value, receiver) {
+        console.log("UPDATED :", property, " WITH :", value);
+
+        target[property] = value;
+        queue(currentComponent);
+        return true;
+      },
+    });
+  }
+
+  //Return the watched object for recursive calls
+  return object;
+}
+
 export default function initRendering() {
   let instantiatedComponents = [];
   for (let comp of components) {
@@ -61,45 +115,7 @@ export default function initRendering() {
       //Create an object with the component instance and it's node
       let currentComponent = { component: new comp(), node: cont };
 
-      //For each property of the state object add a setter
-      for (let propertyKey of Object.keys(currentComponent.component.state)) {
-        //TODO: Managing nested objects and lists
-
-        if (Array.isArray(currentComponent.component.state[propertyKey])) {
-          currentComponent.component.state[propertyKey] = new Proxy(
-            currentComponent.component.state[propertyKey],
-            {
-              apply: function (target, thisArg, argumentsList) {
-                return thisArg[target].apply(this, argumentList);
-              },
-              deleteProperty: function (target, property) {
-                console.log("Deleted %s", property);
-                queue(currentComponent);
-                return true;
-              },
-              set: function (target, property, value, receiver) {
-                target[property] = value;
-                console.log("Set %s to %o", property, value);
-                queue(currentComponent);
-                return true;
-              },
-            }
-          );
-        } else {
-          let temp = currentComponent.component.state[propertyKey];
-
-          Object.defineProperty(currentComponent.component.state, propertyKey, {
-            get: function () {
-              return temp;
-            },
-            set: function (x) {
-              temp = x;
-              console.log("UPDATED :", propertyKey);
-              queue(currentComponent);
-            },
-          });
-        }
-      }
+      watchFor(currentComponent.component.state, currentComponent);
 
       //Add it to the components list
       instantiatedComponents.push(currentComponent);

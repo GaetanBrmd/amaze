@@ -20,7 +20,7 @@ export function renderFn(component) {
       if (!(component.state.count % 2))
         return h(
           "span",
-          { on: { click: () => setTimeout(component.nestedList()) } },
+          { on: { click: () => setTimeout(component.nestedListAndObject()) } },
           "Even number of clicks here."
         );
     })(),

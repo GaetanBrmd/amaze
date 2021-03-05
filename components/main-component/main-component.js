@@ -11,7 +11,8 @@ export class MainComponent extends Component {
       count: 0,
       text: "My Text Inserted",
       list: ["🦄", "🦊", "🐶"],
-      objectList: [{ p1: 1, p2: 3 }],
+      objectList: [{ p1: 1, p2: 3 }, { p3: 5 }],
+      nestedObject: { l1: { l2: false }, bool: true },
     };
 
     this.renderFn = () => renderFn(this);
@@ -20,13 +21,16 @@ export class MainComponent extends Component {
   increment() {
     this.state.count++;
     this.state.text = "o" + this.state.count;
+    this.popPig();
   }
 
   popPig() {
-    this.state.list[0];
+    this.state.list.push("pig");
+    this.state.list.forEach((e) => this.state.list.push(e));
   }
 
-  nestedList() {
+  nestedListAndObject() {
     this.state.objectList[0].p1++;
+    this.state.nestedObject.l1.l2 = true;
   }
 }
