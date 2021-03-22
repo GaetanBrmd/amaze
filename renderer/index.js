@@ -70,6 +70,7 @@ function watchFor(object, currentComponent) {
         set: function (x) {
           console.log("UPDATED :", propertyKey, " WITH :", x);
 
+          //TODO : Update subcomponents linked to this one via prop
           temp = x;
           queue(currentComponent);
         },

@@ -36,10 +36,5 @@ export function renderFn(component) {
         return array;
       })()
     ),
-    h("input", {
-      on: {
-        keypress: console.log,
-      },
-    }),
   ]);
 }
