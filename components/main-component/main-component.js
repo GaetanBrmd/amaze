@@ -26,7 +26,6 @@ export class MainComponent extends Component {
 
   popPig() {
     this.state.list.push("pig");
-    this.state.list.forEach((e) => this.state.list.push(e));
   }
 
   nestedListAndObject() {

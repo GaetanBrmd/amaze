@@ -1,3 +1,4 @@
+import { ExportComponent } from "./export-component/export-component";
 import { MainComponent } from "./main-component/main-component";
 
 /**
@@ -9,4 +10,4 @@ import { MainComponent } from "./main-component/main-component";
  *      - and a set of methods to modify the state.
  */
 
-export const components = [MainComponent];
+export const components = [MainComponent, ExportComponent];

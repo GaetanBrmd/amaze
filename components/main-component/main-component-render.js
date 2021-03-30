@@ -1,5 +1,4 @@
 import { h } from "snabbdom/build/package/h";
-import { components } from "..";
 
 export function renderFn(component) {
   return h("div#app", [
@@ -20,7 +19,9 @@ export function renderFn(component) {
       if (!(component.state.count % 2))
         return h(
           "span",
-          { on: { click: () => setTimeout(component.nestedListAndObject()) } },
+          {
+            on: { click: () => setTimeout(component.nestedListAndObject()) },
+          },
           "Even number of clicks here."
         );
     })(),
