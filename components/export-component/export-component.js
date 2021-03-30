@@ -7,7 +7,9 @@ export class ExportComponent extends Component {
   constructor() {
     super();
 
-    this.state = {};
+    this.state = {
+      e:10
+    };
 
     this.renderFn = () => renderFn(this);
   }
