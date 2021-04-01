@@ -8,9 +8,13 @@ export class ExportComponent extends Component {
     super();
 
     this.state = {
-      e:10
+      e: 10,
     };
 
     this.renderFn = () => renderFn(this);
+  }
+
+  isTrue() {
+    return true;
   }
 }

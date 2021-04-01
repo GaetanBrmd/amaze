@@ -21,14 +21,31 @@ const custom = t.file(
           t.returnStatement(
             hnode("div", [
               t.templateLiteral(
-                [t.templateElement({ raw: "mon texte super " }),t.templateElement({ raw: "bbbbbbb" }),t.templateElement({ raw: "ccc" })],
-                [t.memberExpression(
-                  t.identifier("component"),
-                  t.identifier("state")
-                ),t.memberExpression(t.memberExpression(
-                  t.identifier("component"),
-                  t.identifier("state"),
-                ),t.identifier("b"))]
+                [
+                  t.templateElement({ raw: "mon texte super " }),
+                  t.templateElement({ raw: "bbbbbbb" }),
+                  t.templateElement({ raw: "ccc" }),
+                ],
+                [
+                  t.memberExpression(
+                    t.identifier("component"),
+                    t.identifier("state")
+                  ),
+                  t.memberExpression(
+                    t.memberExpression(
+                      t.identifier("component"),
+                      t.identifier("state")
+                    ),
+                    t.identifier("b")
+                  ),
+                ]
+              ),
+              t.spreadElement(
+                t.conditionalExpression(
+                  babel.parse("isTrue()").program.body[0].expression,
+                  hnode("div", []),
+                  t.nullLiteral()
+                )
               ),
             ])
           ),
@@ -50,21 +67,22 @@ function htext(text) {
 }
 
 const parsed = babel.parse(`
-import { h } from "snabbdom/build/package/h";
-
-export function renderFn(component) {
-  return h("div", [
-    h(\`AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA \$\{component.state.b\}\ bbbbbbb \$\{component.state.c\}\`)
-  ])
-}
+[...(component.state.count % 2)
+      ? [h()]
+      : []]
 `);
 
+console.log(parsed.program.body[0].expression.elements[0]);
+
 console.log(
-  JSON.stringify(
-    parsed.program.body[1].declaration.body.body[0].argument.arguments[1]
-      .elements[0].arguments,
-    null,
-    2
+  JSON.stringify(parsed.program.body, null, 2),
+  "VVVVVVVVVVVVSSSSSSSSSSS",
+  t.expressionStatement(
+    t.conditionalExpression(
+      babel.parse("component.state.a == 2").program.body[0].expression,
+      hnode("div", []),
+      t.nullLiteral()
+    )
   )
 );
 
