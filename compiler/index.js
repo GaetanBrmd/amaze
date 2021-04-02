@@ -33,6 +33,7 @@ function visit(ast) {
   let node;
 
   if (ast.tag) {
+    ast.options = {};
     if (ast.attrs) {
       console.log(ast.attrs);
       if (ast.attrs.class) {
@@ -44,10 +45,14 @@ function visit(ast) {
       if (ast.attrs.if) {
         return ifStatement(ast.attrs.if, children);
       }
+      if (ast.attrs.click) {
+        if (!ast.options.on) ast.options.on = {};
+        ast.options.on.click = ast.attrs.click;
+      }
     }
-    node = hnode(ast.tag, children);
+    node = hnode(ast.tag, ast.options, children);
   } else {
-    node = program(hnode("component", children));
+    node = program(hnode("component", {}, children));
   }
 
   return node;
@@ -73,9 +78,34 @@ function program(main_node) {
   );
 }
 
-function hnode(div_type, childrens) {
+function hnode(div_type, options, childrens) {
   return t.callExpression(t.identifier("h"), [
     t.stringLiteral(div_type),
+    // If options add an argument
+    ...Object.keys(options).map((o) =>
+      t.objectExpression([
+        ...(o == "on"
+          ? [
+              t.objectProperty(
+                t.identifier("on"),
+                t.objectExpression([
+                  ...Object.keys(options[o]).map((n) =>
+                    t.objectProperty(
+                      t.identifier(n),
+                      t.arrowFunctionExpression(
+                        [],
+                        t.callExpression(t.identifier("setTimeout"), [
+                          attach(options.on[n]),
+                        ])
+                      )
+                    )
+                  ),
+                ])
+              ),
+            ]
+          : []),
+      ])
+    ),
     t.arrayExpression(childrens),
   ]);
 }

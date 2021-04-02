@@ -17,4 +17,9 @@ export class ExportComponent extends Component {
   isTrue() {
     return true;
   }
+
+  print() {
+    console.log("Je print")
+    this.state.e++
+  }
 }
