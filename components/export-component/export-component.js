@@ -9,6 +9,7 @@ export class ExportComponent extends Component {
 
     this.state = {
       e: 10,
+      array: [1, 2, 3],
     };
 
     this.renderFn = () => renderFn(this);
@@ -19,7 +20,8 @@ export class ExportComponent extends Component {
   }
 
   print() {
-    console.log("Je print")
-    this.state.e++
+    console.log("Je print");
+    this.state.e++;
+    this.state.array.push(this.state.e);
   }
 }

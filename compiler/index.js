@@ -14,45 +14,50 @@ const fs = require("fs");
 
 // PARSER AND OPTIMISER
 
-function visit(ast) {
+function visit(ast, env) {
   const childs = ast.content;
 
   let children = [];
 
-  for (let i = 0; i < childs.length; i++) {
-    if (typeof childs[i] === "object") {
-      // console.log("NODE :", childs[i]);
-      children.push(visit(childs[i]));
-    } else {
-      // console.log("STRING :", childs[i].trim(), childs[i].trim() == "");
-      childs[i].trim() == "" ? "" : children.push(htext(childs[i].trim()));
-    }
-  }
-
-  // return current node with childrens
+  // Build current node with childrens
   let node;
 
   if (ast.tag) {
     ast.options = {};
     if (ast.attrs) {
       console.log(ast.attrs);
+      // TODO : Rework with iterating over attrs and then check what attrs it is, event with on must be set like (event)
       if (ast.attrs.class) {
         ast.tag += "." + ast.attrs.class.split(" ").join(".");
       }
       if (ast.attrs.id) {
         ast.tag += "#" + ast.attrs.id;
       }
-      if (ast.attrs.if) {
-        return ifStatement(ast.attrs.if, children);
-      }
       if (ast.attrs.click) {
         if (!ast.options.on) ast.options.on = {};
         ast.options.on.click = ast.attrs.click;
       }
+
+      if (ast.attrs.if) {
+        node = ifStatement(ast.tag, ast.options, children, ast.attrs.if, env);
+      }
+      if (ast.attrs.for) {
+        node = forStatement(ast.tag, ast.options, children, ast.attrs.for, env);
+      }
     }
-    node = hnode(ast.tag, ast.options, children);
+    node = node ? node : hnode(ast.tag, ast.options, children, env);
   } else {
-    node = program(hnode("component", {}, children));
+    node = program(hnode("component", {}, children, env));
+  }
+
+  for (let i = 0; i < childs.length; i++) {
+    if (typeof childs[i] === "object") {
+      // console.log("NODE :", childs[i]);
+      children.push(visit(childs[i], env.slice(0)));
+    } else {
+      // console.log("STRING :", childs[i].trim(), childs[i].trim() == "");
+      childs[i].trim() == "" ? "" : children.push(htext(childs[i].trim(), env));
+    }
   }
 
   return node;
@@ -78,7 +83,7 @@ function program(main_node) {
   );
 }
 
-function hnode(div_type, options, childrens) {
+function hnode(div_type, options, childrens, env) {
   return t.callExpression(t.identifier("h"), [
     t.stringLiteral(div_type),
     // If options add an argument
@@ -95,7 +100,7 @@ function hnode(div_type, options, childrens) {
                       t.arrowFunctionExpression(
                         [],
                         t.callExpression(t.identifier("setTimeout"), [
-                          attach(options.on[n]),
+                          attach(options.on[n], env),
                         ])
                       )
                     )
@@ -110,31 +115,48 @@ function hnode(div_type, options, childrens) {
   ]);
 }
 
-function htext(text) {
+function htext(text, env) {
   let quasis = text
     .split(/{{[ 	]*[\w.()]+[ 	]*}}/g)
     .map((e) => t.templateElement({ raw: e }));
   let expressions = text.match(/{{[   ]*[\w.()]+[  ]*}}/g);
+
   expressions = expressions
-    ? expressions.map((m) => attach(m.slice(2, -2).trim()))
+    ? expressions.map((m) => attach(m.slice(2, -2).trim(), env))
     : [];
   return t.templateLiteral(quasis, expressions);
 }
 
-function ifStatement(condition, childrens) {
+function ifStatement(tag, options, childrens, condition, env) {
   return t.spreadElement(
     t.conditionalExpression(
-      // attach(babel.parse(condition)),
-      attach(condition),
-      t.arrayExpression(childrens),
+      attach(condition, env),
+      t.arrayExpression([hnode(tag, options, childrens, env)]),
       t.arrayExpression()
     )
   );
 }
 
-function attach(expression) {
+function forStatement(tag, options, childrens, loop, env) {
+  loop = loop.split(" of ");
+  env.push(loop[0]);
+  let res = t.spreadElement(
+    t.callExpression(
+      t.memberExpression(attach(loop[1], env), t.identifier("map")),
+      [
+        t.arrowFunctionExpression(
+          [t.identifier(loop[0])],
+          hnode(tag, options, childrens, env)
+        ),
+      ]
+    )
+  );
+  return res;
+}
+
+function attach(expression, env) {
   //console.log(JSON.stringify(expression, null, 2));
-  let env = ["c"];
+  console.log(env);
   let res = babel.transformSync(expression, {
     ast: true,
     code: false,
@@ -179,7 +201,7 @@ const ast = { content: parser(html) };
 
 // console.log(JSON.stringify(ast)); // Logs a HTML AST
 
-const generated = generate(visit(ast)).code;
+const generated = generate(visit(ast, [])).code;
 
 console.log(generated);
 

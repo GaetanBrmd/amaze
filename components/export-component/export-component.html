@@ -1,11 +1,13 @@
 <h1 class="bidule prout">My First Heading</h1>
-<p id="a" click="print()">My first paragraph.</p>
+<button id="a" click="print()">My first button.</button>
 
 <div if="e > 10">
     abc
-    <h2 if="isTrue()">Title</h2>
-    <p click="print()">azeaze {{ e.toString() }}</p>
+    <h2>Title</h2>
+    <p>azeaze {{ e.toString() }}</p>
     <ul>
-        <li for="e of array">item {{ isTrue() }}</li>
+        <li for="e of array" click="e++">item {{ e }}
+            <a href="">link</a>
+        </li>
     </ul>
 </div>
