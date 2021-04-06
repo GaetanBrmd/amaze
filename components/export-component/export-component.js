@@ -19,6 +19,14 @@ export class ExportComponent extends Component {
     return true;
   }
 
+  test(e) {
+    return e > 10;
+  }
+
+  foo() {
+    console.log("foo");
+  }
+
   print() {
     console.log("Je print");
     this.state.e++;

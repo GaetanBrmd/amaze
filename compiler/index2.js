@@ -1,4 +1,4 @@
-const parser = require("./parser/parser").parser;
+const parser = require("posthtml-parser");
 
 const generate = require("@babel/generator").default;
 const t = require("@babel/types");
@@ -15,7 +15,7 @@ const fs = require("fs");
 // PARSER AND OPTIMISER
 
 function visit(ast, env) {
-  const childs = ast.childs;
+  const childs = ast.content;
 
   let children = [];
 
@@ -25,36 +25,26 @@ function visit(ast, env) {
   if (ast.tag) {
     ast.options = {};
     if (ast.attrs) {
-      ast.attrs.forEach((a) => {
-        if (a.key == "class") {
-          ast.tag += "." + a.value.join(".");
-        }
-        if (a.key == "id") {
-          ast.tag += "#" + a.value;
-        }
+      console.log(ast.attrs);
+      // TODO : Rework with iterating over attrs and then check what attrs it is, event with on must be set like (event)
+      if (ast.attrs.class) {
+        ast.tag += "." + ast.attrs.class.split(" ").join(".");
+      }
+      if (ast.attrs.id) {
+        ast.tag += "#" + ast.attrs.id;
+      }
+      if (ast.attrs.click) {
+        if (!ast.options.on) ast.options.on = {};
+        ast.options.on.click = ast.attrs.click;
+      }
 
-        if (a.key == "if") {
-          node = ifStatement(ast.tag, ast.options, children, a.value, env);
-        }
-        if (a.key == "for") {
-          node = forStatement(
-            ast.tag,
-            ast.options,
-            children,
-            a.value.join(" "),
-            env
-          );
-        }
-      });
+      if (ast.attrs.if) {
+        node = ifStatement(ast.tag, ast.options, children, ast.attrs.if, env);
+      }
+      if (ast.attrs.for) {
+        node = forStatement(ast.tag, ast.options, children, ast.attrs.for, env);
+      }
     }
-    if (ast.on)
-      ast.on.forEach((o) => {
-        if (o.key) {
-          if (!ast.options.on) ast.options.on = {};
-          ast.options.on[o.key] = o.value;
-        }
-      });
-
     node = node ? node : hnode(ast.tag, ast.options, children, env);
   } else {
     node = program(hnode("component", {}, children, env));
@@ -165,8 +155,8 @@ function forStatement(tag, options, childrens, loop, env) {
 }
 
 function attach(expression, env) {
-  console.log(JSON.stringify(expression, null, 2));
-  //console.log(env);
+  //console.log(JSON.stringify(expression, null, 2));
+  console.log(env);
   let res = babel.transformSync(expression, {
     ast: true,
     code: false,
@@ -176,17 +166,13 @@ function attach(expression, env) {
           visitor: {
             Identifier(path) {
               // If it's the second item of property don't touch it
-              if (expression[0] == "test(e)") console.log();
               if (
                 !t.isMemberExpression(path.parent) ||
                 (t.isMemberExpression(path.parent) &&
                   path.node != path.parent.property)
               ) {
                 // Attach functions to component
-                if (
-                  t.isCallExpression(path.parent) &&
-                  !path.parent.arguments.includes(path.node)
-                ) {
+                if (t.isCallExpression(path.parent)) {
                   path.node.name = "component." + path.node.name;
                 }
                 // Attach property to component.state if not in the nev
@@ -210,9 +196,9 @@ const html = fs.readFileSync(
   "utf-8"
 );
 
-const ast = { childs: parser.parse(html) };
+const ast = { content: parser(html) };
 
-// console.log(JSON.stringify(ast)); // Logs a HTML AST
+console.log(JSON.stringify(ast)); // Logs a HTML AST
 
 const generated = generate(visit(ast, [])).code;
 

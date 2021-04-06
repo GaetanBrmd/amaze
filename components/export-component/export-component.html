@@ -1,13 +1,14 @@
 <h1 class="bidule prout">My First Heading</h1>
-<button id="a" click="print()">My first button.</button>
+<button id="a" @click="print()">My first button.</button>
 
-<div if="e > 10">
+<div if="test(e)">
     abc
     <h2>Title</h2>
-    <p>azeaze {{ e.toString() }}</p>
+    <p @dblclick="foo()">azeaze {{ e.toString() }}</p>
     <ul>
-        <li for="e of array" click="e++">item {{ e }}
-            <a href="">link</a>
+        <li for="e of array" @click="print()">item {{ e }}
+            <a>link</a>
         </li>
     </ul>
+    <input type="text" />
 </div>

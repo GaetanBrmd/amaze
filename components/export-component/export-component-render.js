@@ -4,9 +4,9 @@ export function renderFn(component) {
     on: {
       click: () => setTimeout(component.print())
     }
-  }, [`My first button.`]), ...(component.state.e > 10 ? [h("div", [`abc`, h("h2", [`Title`]), h("p", [`azeaze ${component.state.e.toString()}`]), h("ul", [...component.state.array.map(e => h("li", {
+  }, [`My first button.`]), ...(component.test(component.state.e) ? [h("div", [`abc`, h("h2", [`Title`]), h("p", {
     on: {
-      click: () => setTimeout(e++)
+      dblclick: () => setTimeout(component.foo())
     }
-  }, [`item ${e}`, h("a", [`link`])]))])])] : [])]);
+  }, [`azeaze ${component.state.e.toString()}`]), h("ul", [...component.state.array.map(e => h("li", [`item ${e}`, h("a", [`link`])]))])])] : [])]);
 }
