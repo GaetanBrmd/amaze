@@ -8,5 +8,5 @@ export function renderFn(component) {
     on: {
       dblclick: () => setTimeout(component.foo())
     }
-  }, [`azeaze ${component.state.e.toString()}`]), h("ul", [...component.state.array.map(e => h("li", [`item ${e}`, h("a", [`link`])]))])])] : [])]);
+  }, [`azeaze ${component.state.e.toString()}`]), h("ul", [...component.state.array.map(e => h("li", [`Item ${e}`, h("a", [`this link`])]))]), h("input", [])])] : [])]);
 }

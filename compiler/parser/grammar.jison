@@ -24,8 +24,8 @@ ElementList
    ;
 
 Element
-     : "<" IDENT AttrList "/" ">" -> {tag:$2,...$3}
-     | "<" IDENT AttrList ">" "<" "/" IDENT ">" -> {tag: $2,...3}
+     : "<" IDENT AttrList "/" ">" -> {tag:$2,...$3,childs:[]}
+     | "<" IDENT AttrList ">" "<" "/" IDENT ">" -> {tag: $2,...3,childs:[]}
      | "<" IDENT AttrList ">" ElementList  "<" "/" IDENT ">" -> {tag:$2,...$3,childs:$5}
      | IdentList -> $1.join(' ')
      ;
@@ -57,4 +57,5 @@ On
 IdentList
     : IDENT -> [$1]
     | IdentList IDENT -> [...$1,$2]
+    | -> []
    ;

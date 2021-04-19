@@ -165,7 +165,7 @@ function forStatement(tag, options, childrens, loop, env) {
 }
 
 function attach(expression, env) {
-  console.log(JSON.stringify(expression, null, 2));
+  //console.log(JSON.stringify(expression, null, 2));
   //console.log(env);
   let res = babel.transformSync(expression, {
     ast: true,
@@ -205,21 +205,34 @@ function attach(expression, env) {
 
 // INDEX
 
-const html = fs.readFileSync(
-  "../components/export-component/export-component.html",
-  "utf-8"
-);
+fs.readdirSync('../components').forEach(f => {
+  if(f.slice(-2) != 'js') {
+    const htmlFile = `../components/${f}/${f}.html`
+    const renderFile = `../components/${f}/${f}-render.js`
+    const html = fs.readFileSync(htmlFile,"utf-8")
+    const htmlAst = { childs: parser.parse(html) }
+    const jsAst = visit(htmlAst,[])
+    const code = generate(jsAst).code
+    fs.writeFileSync(renderFile,code)
+    console.log(code);
+  }
+});
 
-const ast = { childs: parser.parse(html) };
+// const html = fs.readFileSync(
+//   "../components/export-component/export-component.html",
+//   "utf-8"
+// );
 
-// console.log(JSON.stringify(ast)); // Logs a HTML AST
+// const ast = { childs: parser.parse(html) };
 
-const generated = generate(visit(ast, [])).code;
+// // console.log(JSON.stringify(ast)); // Logs a HTML AST
 
-console.log(generated);
+// const generated = generate(visit(ast, [])).code;
 
-fs.writeFile(
-  "../components/export-component/export-component-render.js",
-  generated,
-  () => {}
-);
+// console.log(generated);
+
+// fs.writeFile(
+//   "../components/export-component/export-component-render.js",
+//   generated,
+//   () => {}
+// );

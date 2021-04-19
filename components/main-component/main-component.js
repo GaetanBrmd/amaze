@@ -32,4 +32,8 @@ export class MainComponent extends Component {
     this.state.objectList[0].p1++;
     this.state.nestedObject.l1.l2 = true;
   }
+
+  odd(o) {
+    return !o % 2
+  }
 }

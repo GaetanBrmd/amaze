@@ -17,6 +17,9 @@
 # Get Started
 
 ```
+//Download dependencies
+npm i
+
 // Run server on localhost:1234
 npm run dev
 

@@ -1,0 +1,10 @@
+<div id="app">
+    <button style="fontWeight:bold" @click="increment()">Click On Me </button>
+    <span>You have clicked {{ count }} times...</span>
+    <span if="odd(count)" @click="nestedListAndObject()">Even number of clicks here.</span>
+    <div>My inserted text here : {{text}}</div>
+    <ul>
+        <li for="o of list" @click="popPig()">{{o}}</li>
+    </ul>
+    <input type="text" @keypress="increment()"/>
+</div>

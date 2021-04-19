@@ -9,7 +9,7 @@ export class ExportComponent extends Component {
 
     this.state = {
       e: 10,
-      array: [1, 2, 3],
+      array: ['🦓', '🦍', '🐶'],
     };
 
     this.renderFn = () => renderFn(this);
@@ -28,8 +28,9 @@ export class ExportComponent extends Component {
   }
 
   print() {
+    let array = ['🦊','🦝','🐮','🐷','🐑','🦛','🐻','🐨','🐼']
     console.log("Je print");
     this.state.e++;
-    this.state.array.push(this.state.e);
+    this.state.array.push(array[Math.floor(Math.random() * array.length)]);
   }
 }
